@@ -1,3 +1,5 @@
+use std::net::Ipv4Addr;
+
 use reqwest::Error;
 
 #[tokio::main]
@@ -43,7 +45,7 @@ struct IPAddressAllocation {
     registry: String,
     country_code: String,
     ip_version: String,
-    ip_address: String,
+    ip_address: Ipv4Addr, //todo: handle IPv6 addresses too
     block_size: u32,
     date: String,
     status: String,
@@ -62,7 +64,7 @@ impl IPAddressAllocation {
             registry: parts[0].to_string(),
             country_code: parts[1].to_string(),
             ip_version: parts[2].to_string(),
-            ip_address: parts[3].to_string(),
+            ip_address: parts[3].parse().map_err(|_| "Invalid IP Address")?,
             block_size: parts[4].parse().map_err(|_| "Invalid block size")?,
             date: parts[5].to_string(),
             status: parts[6].to_string(),
