@@ -2,6 +2,8 @@ use std::net::Ipv4Addr;
 
 use reqwest::Error;
 
+mod country;
+
 #[tokio::main]
 async fn main() -> Result<(), Error> {
     let urls = vec![
@@ -13,7 +15,6 @@ async fn main() -> Result<(), Error> {
     ];
 
     for url in urls {
-
         let test = get_ips(url).await?;
 
         for thing in test {
@@ -25,12 +26,12 @@ async fn main() -> Result<(), Error> {
 }
 
 async fn get_ips(url: &str) -> Result<Vec<IPAddressAllocation>, Error> {
-
     let response = reqwest::get(url).await?.text().await?;
 
     let data = parse_data(&response);
-    
-    let allocations: Vec<IPAddressAllocation> = data.iter()
+
+    let allocations: Vec<IPAddressAllocation> = data
+        .iter()
         .filter_map(|line| match IPAddressAllocation::from_line(line) {
             Ok(allocation) => Some(allocation),
             Err(_) => None,
@@ -47,11 +48,10 @@ struct IPAddressAllocation {
     ip_version: String,
     ip_address: Ipv4Addr, //todo: handle IPv6 addresses too
     block_size: u32,
-    date: String,
-    status: String,
-    //unique_id: u32, //some registries keep hexadecimal unique_id instead of u32
+    date: String, //todo: proper date
+    status: String, //options: assigned, reserved, allocated
+                  //unique_id: u32, //some registries keep hexadecimal unique_id instead of u32
 }
-
 
 impl IPAddressAllocation {
     fn from_line(line: &str) -> Result<Self, &'static str> {
@@ -79,7 +79,6 @@ fn parse_data(data: &str) -> Vec<&str> {
 
 #[test]
 fn test_parser() {
-
     let data = [
         "lacnic|BR|ipv4|24.152.8.0|1024|20200309|allocated|301675",
         "lacnic|BR|ipv4|24.152.72.0|1024|20200311|allocated|274578",
@@ -88,7 +87,7 @@ fn test_parser() {
         "afrinic|ZA|asn|1232|1|19910301|allocated|F36B9F4B",
         "afrinic|ZA|asn|2018|1|20010307|allocated|F36B9F4B",
         "afrinic|EG|asn|2561|1|20070920|allocated|F3648BE1",
-        "afrinic|ZA|asn|2905|1|19930910|allocated|F367678F"
+        "afrinic|ZA|asn|2905|1|19930910|allocated|F367678F",
     ];
 
     for line in data.iter() {
