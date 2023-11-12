@@ -35,11 +35,6 @@ async fn get_ips(url: &str) -> Result<Vec<IPAddressAllocation>, Error> {
         })
         .collect();
 
-    // Use `allocations` as needed
-    for allocation in &allocations {
-        println!("{:#?}", allocation);
-    }
-
     Ok(allocations)
 }
 
@@ -52,7 +47,7 @@ struct IPAddressAllocation {
     block_size: u32,
     date: String,
     status: String,
-    //unique_id: u32,
+    //unique_id: u32, //some registries keep hexadecimal unique_id instead of u32
 }
 
 
