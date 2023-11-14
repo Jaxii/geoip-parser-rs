@@ -1,5 +1,6 @@
 use std::net::Ipv4Addr;
 
+use country::country::{str_to_countrycode, CountryCode};
 use reqwest::Error;
 
 mod country;
@@ -43,9 +44,9 @@ async fn get_ips(url: &str) -> Result<Vec<IPAddressAllocation>, Error> {
 
 #[derive(Debug)]
 struct IPAddressAllocation {
-    registry: String,
-    country_code: String,
-    ip_version: String,
+    registry: String, //todo make enum too
+    country_code: CountryCode,
+    ip_version: String,   //todo: "ipv4" or "ipv6"
     ip_address: Ipv4Addr, //todo: handle IPv6 addresses too
     block_size: u32,
     date: String, //todo: proper date
@@ -62,7 +63,7 @@ impl IPAddressAllocation {
 
         Ok(Self {
             registry: parts[0].to_string(),
-            country_code: parts[1].to_string(),
+            country_code: str_to_countrycode(parts[1])?,
             ip_version: parts[2].to_string(),
             ip_address: parts[3].parse().map_err(|_| "Invalid IP Address")?,
             block_size: parts[4].parse().map_err(|_| "Invalid block size")?,

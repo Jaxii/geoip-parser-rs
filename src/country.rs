@@ -1,17 +1,21 @@
-
-mod country {
+pub mod country {
 
     use strum::{EnumCount, IntoEnumIterator};
-    use strum_macros::{EnumCount as EnumCountMacro, EnumIter, EnumString, IntoStaticStr};    
+    use strum_macros::{EnumCount as EnumCountMacro, EnumIter, EnumString, IntoStaticStr};
 
     #[test]
     fn get_enum_count() {
         println!("CountryCode enum count: {}", CountryCode::COUNT);
     }
 
+    pub fn str_to_countrycode(input: &str) -> Result<CountryCode, &'static str> {
+        <CountryCode as std::str::FromStr>::from_str(input)
+            .map_err(|_| "CountryCode variant not found")
+    }
+
     //torture
     #[derive(Debug, EnumCountMacro, EnumIter, EnumString, IntoStaticStr)]
-    enum CountryCode {
+    pub enum CountryCode {
         AF,
         AX,
         AL,
